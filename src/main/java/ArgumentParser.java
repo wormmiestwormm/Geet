@@ -1,24 +1,33 @@
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class ArgumentParser {
     private String[] args;
-    public ArgumentParser(String[] args) {
+    private static Repository newRepo = new Repository();
+    private static StorageModule storage = new StorageModule();
+    private static StagingArea stage;
+    public ArgumentParser(String[] args) throws FileNotFoundException {
         this.args = args;
+        stage = new StagingArea();
     }
 
-    public void getCommand(){
+    public void getCommand() throws IOException {
         switch(args[0]){
             case "init":
-                File directory = new File("");
-                String userDirectory = directory.getAbsolutePath();
                 //Initialize geet repository using userDictionary in StagingArea or StorageModule
-                System.out.println("Initialized geet repository in " + userDirectory);
-                break;
+                try{
+                    newRepo.initializeRepository();
+                    System.out.println("Initialized geet repository in " + newRepo.getRepoPath());
+                    break;
+                }catch(IOException e){
+                    break;
+            }
 
             case "add":
                 if (args.length < 2){
                     System.out.println("Error: No file specified" +
-                            "\nPlease specify the file name: geet.bat add <file>");
+                                     "\nPlease specify the file name: geet.bat add <file>");
                     break;
                 }
                 File newFile = new File(args[1]);
@@ -29,6 +38,8 @@ public class ArgumentParser {
                 }
                 else {
                     //add to repository in StagingArea
+                    stage.addFileToStagingArea(newFile);
+
                     System.out.println("Added " + newFile.getName() + " to commit");
                     break;
                 }
@@ -36,7 +47,7 @@ public class ArgumentParser {
             case "commit":
                 if (args.length < 2){
                     System.out.println("Error: Invalid commit" +
-                            "\nPlease add commit comment: geet.bat commit <\"commit message\">");
+                            "\nPlease add commit comment: geet.bat commit <commit message>");
                     break;
                 }
                 else {
