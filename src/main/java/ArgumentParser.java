@@ -14,8 +14,8 @@ public class ArgumentParser {
 
     public void getCommand() throws IOException {
         switch(args[0]){
+            //Initializes geet repository in current directory if one doesn't already exist
             case "init":
-                //Initialize geet repository using userDictionary in StagingArea or StorageModule
                 try{
                     newRepo.initializeRepository();
                     System.out.println("Initialized geet repository in " + newRepo.getRepoPath());
@@ -24,6 +24,7 @@ public class ArgumentParser {
                     break;
             }
 
+                //Adds a specified file to the staging area if the file exists
             case "add":
                 if (args.length < 2){
                     System.out.println("Error: No file specified" +
@@ -32,18 +33,18 @@ public class ArgumentParser {
                 }
                 File newFile = new File(args[1]);
 
-                if (newFile.exists()) {
+                if (!newFile.exists()) {
                     System.out.println("Error: file name doesn't exist");
                     break;
                 }
                 else {
-                    //add to repository in StagingArea
                     stage.addFileToStagingArea(newFile);
 
                     System.out.println("Added " + newFile.getName() + " to commit");
                     break;
                 }
 
+                //Adds files from staging area to the repository with a commit message.
             case "commit":
                 if (args.length < 2){
                     System.out.println("Error: Invalid commit" +
@@ -55,6 +56,7 @@ public class ArgumentParser {
                     break;
                 }
 
+                //displays the commit history
             case "log":
                 System.out.println("log will be added later");
                 break;
