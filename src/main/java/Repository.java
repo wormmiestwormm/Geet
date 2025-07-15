@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Repository {
-    Path repoPath = Paths.get("geet");
+    Path repoPath = Paths.get(".geet");
     Path parentPath = repoPath.toAbsolutePath().getParent();
 
     //create .geet folder to store all the different commits
