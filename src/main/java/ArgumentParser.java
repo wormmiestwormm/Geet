@@ -9,10 +9,20 @@ public class ArgumentParser {
     private static StagingArea stage;
     public ArgumentParser(String[] args) throws FileNotFoundException {
         this.args = args;
-        stage = new StagingArea();
     }
 
     public void getCommand() throws IOException {
+        if (args.length < 1){
+            System.out.println("-----------------------------------------------------------------------------------" +
+                    "\nCommand list:" +
+                    "\n\ninit - Initialize geet repository in current directory" +
+                    "\nadd <file> - add listed file to staging area" +
+                    "\ncommit -m <\"commit message\"> - records files in staging area in the repository" +
+                    "\nlog - view commit history" +
+                    "\n\n-----------------------------------------------------------------------------------");
+            return;
+        }
+
         switch(args[0]){
             //Initializes geet repository in current directory if one doesn't already exist
             case "init":
@@ -26,6 +36,7 @@ public class ArgumentParser {
 
                 //Adds a specified file to the staging area if the file exists
             case "add":
+                stage = new StagingArea();
                 if (args.length < 2){
                     System.out.println("Error: No file specified" +
                                      "\nPlease specify the file name: geet.bat add <file>");
@@ -33,7 +44,7 @@ public class ArgumentParser {
                 }
                 File newFile = new File(args[1]);
 
-                if (!newFile.exists()) {
+                if (!newFile.getAbsoluteFile().exists()) {
                     System.out.println("Error: file name doesn't exist");
                     break;
                 }
@@ -59,16 +70,6 @@ public class ArgumentParser {
                 //displays the commit history
             case "log":
                 System.out.println("log will be added later");
-                break;
-
-            case "":
-                System.out.println("-----------------------------------------------------------------------------------" +
-                                   "\nCommand list:" +
-                        "\n\ninit - Initialize geet repository in current directory" +
-                        "\nadd <file> - add listed file to staging area" +
-                        "\ncommit -m <\"commit message\"> - records files in staging area in the repository" +
-                        "\nlog - view commit history" +
-                        "\n\n-----------------------------------------------------------------------------------");
                 break;
 
             default:
