@@ -1,1 +1,1 @@
-java -jar C:\Users\theja\IdeaProjects\Geet\src\main\java\build\geet.jar %1 %2 %3 %4 %5 %6 %7 %8 %
+java -jar C:\Users\theja\IdeaProjects\Geet\target\Geet-0.1.jar %1 %2 %3 %4 %5 %6 %7 %8 %9
