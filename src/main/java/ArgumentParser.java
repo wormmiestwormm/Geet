@@ -49,10 +49,14 @@ public class ArgumentParser {
                     break;
                 }
                 else {
-                    stage.addFileToStagingArea(newFile);
-
-                    System.out.println("Added " + newFile.getName() + " to commit");
-                    break;
+                    if (!stage.addFileToStagingArea(newFile)){
+                        System.out.println("Error: file already added to staging area");
+                        break;
+                    }
+                    else {
+                        System.out.println("Added " + newFile.getName() + " to staging area");
+                        break;
+                    }
                 }
 
                 //Adds files from staging area to the repository with a commit message.

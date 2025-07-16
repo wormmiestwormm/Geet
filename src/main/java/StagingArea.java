@@ -3,41 +3,53 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.*;
+
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 
 public class StagingArea {
-    //constructor
-    private static ArrayList<File> stageList = new ArrayList<>();
     private FileOutputStream stageFile;
-
-    private Path repoPath = Paths.get(".geet");
-
-    private Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static Path repoPath = Paths.get(".geet");
 
     public StagingArea() throws IOException {
-        FileWriter writer = new FileWriter(repoPath + "\\" + "stage.json");
     }
 
     //adds file to staging area
-    public void addFileToStagingArea(File newFile) throws IOException {
-        stageList.add(newFile);
-        try {
-            Reader reader = Files.newBufferedReader(Paths.get("stage.json"));
-            stageList = gson.fromJson(reader, (Type) stageList);
-            reader.close();
+    public boolean addFileToStagingArea(File newFile) throws IOException {
+        Set<String> stageList = readStage();
 
-
-            System.out.println(stageList);
-
-            FileWriter writer = new FileWriter(repoPath + "\\" + "stage.json");
-            gson.toJson(stageList, writer);
-            writer.close();
+        if (stageList == null){
+            stageList = new HashSet<>();
         }
-        catch(IOException e) {
+        if (!stageList.add(newFile.getName())){
+            return false;
+        }
+        writeStage(stageList, newFile);
+        return true;
+    }
 
+    public static Set<String> readStage() throws IOException{
+        try (Reader reader = new FileReader(".geet\\stagingArea.json")){
+            Type jsonStageList = new TypeToken<Set<String>>() {}.getType();
+            Gson gson = new Gson();
+            return gson.fromJson(reader, jsonStageList);
+        }
+        catch (IOException e){
+            throw new RuntimeException(e);
         }
     }
+
+    public static void writeStage(Set<String> stageList, File newFile) {
+        try (Writer writer = new FileWriter(".geet\\stagingArea.json")){
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            gson.toJson(stageList, writer);
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     //adds files in staging area to repository in storage module
     public void commitChanges(){

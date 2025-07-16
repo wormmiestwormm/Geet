@@ -1,1 +1,2 @@
-java -jar C:\Users\theja\IdeaProjects\Geet\target\Geet-0.1.jar %1 %2 %3 %4 %5 %6 %7 %8 %9
+C:\Users\theja\.jdks\openjdk-22.0.2\bin\java.exe "-javaagent:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2024.2.0.2\lib\idea_rt.jar=53916:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2024.2.0.2\bin" -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8 -classpath C:\Users\theja\IdeaProjects\Geet\target\classes;C:\Users\theja\.m2\repository\com\google\code\gson\gson\2.13.1\gson-2.13.1.jar;C:\Users\theja\.m2\repository\com\google\errorprone\error_prone_annotations\2.38.0\error_prone_annotations-2.38.0.jar Geet %1 %2 %3 %4 %5 %6 %7 %8 %9
+REM java -jar C:\Users\theja\IdeaProjects\Geet\target\Geet-0.1.jar %1 %2 %3 %4 %5 %6 %7 %8 %9
