@@ -3,17 +3,15 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
 public class StagingArea {
-    private FileOutputStream stageFile;
-    private static Path repoPath = Paths.get(".geet");
 
-    public StagingArea() throws IOException {
-    }
+    public StagingArea(){}
 
     //adds file to staging area
     public boolean addFileToStagingArea(File newFile) throws IOException {
@@ -22,13 +20,14 @@ public class StagingArea {
         if (stageList == null){
             stageList = new HashSet<>();
         }
-        if (!stageList.add(newFile.getName())){
+        if (!stageList.add(newFile.getPath())){
             return false;
         }
-        writeStage(stageList, newFile);
+        writeStage(stageList);
         return true;
     }
 
+    //reads arraylist of file names from stagingArea.json
     public static Set<String> readStage() throws IOException{
         try (Reader reader = new FileReader(".geet\\stagingArea.json")){
             Type jsonStageList = new TypeToken<Set<String>>() {}.getType();
@@ -40,7 +39,8 @@ public class StagingArea {
         }
     }
 
-    public static void writeStage(Set<String> stageList, File newFile) {
+    //adds updated arraylist to stagingArea.json
+    public static void writeStage(Set<String> stageList) {
         try (Writer writer = new FileWriter(".geet\\stagingArea.json")){
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(stageList, writer);
@@ -50,11 +50,18 @@ public class StagingArea {
         }
     }
 
-
     //adds files in staging area to repository in storage module
-    public void commitChanges(){
-        //Files.copy(newFile.toPath(),
-        //        new File(repoPath + "\\" + newFile.getName()).toPath(),
-        //        StandardCopyOption.REPLACE_EXISTING);
+    public boolean commitChanges(String commitMessage) throws IOException {
+        Set<String> stageList = readStage();
+        if (stageList == null) {
+            return false;
+        }
+
+        StorageModule s = new StorageModule();
+        s.logChanges(commitMessage, stageList);
+
+        stageList.clear();
+        writeStage(stageList);
+        return true;
     }
 }

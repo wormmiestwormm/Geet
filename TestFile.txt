@@ -1,4 +1,0 @@
-This will be copied correctly into the staging area
-
-mvn clean install
-jar cmvf META-INF/MANIFEST.MF geet.jar *

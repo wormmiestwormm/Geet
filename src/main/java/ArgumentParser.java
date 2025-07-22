@@ -6,19 +6,21 @@ public class ArgumentParser {
     private String[] args;
     private static Repository newRepo = new Repository();
     private static StorageModule storage = new StorageModule();
-    private static StagingArea stage;
+    private static StagingArea stage = new StagingArea();
     public ArgumentParser(String[] args) throws FileNotFoundException {
         this.args = args;
     }
 
+    //
     public void getCommand() throws IOException {
         if (args.length < 1){
             System.out.println("-----------------------------------------------------------------------------------" +
                     "\nCommand list:" +
                     "\n\ninit - Initialize geet repository in current directory" +
-                    "\nadd <file> - add listed file to staging area" +
-                    "\ncommit -m <\"commit message\"> - records files in staging area in the repository" +
+                    "\nadd <your file> - add listed file to staging area" +
+                    "\ncommit <\"your commit message\"> - records files in staging area in the repository" +
                     "\nlog - view commit history" +
+                    "\nbranch" +
                     "\n\n-----------------------------------------------------------------------------------");
             return;
         }
@@ -26,20 +28,21 @@ public class ArgumentParser {
         switch(args[0]){
             //Initializes geet repository in current directory if one doesn't already exist
             case "init":
-                try{
+                if (newRepo.initializeRepository()){
                     newRepo.initializeRepository();
                     System.out.println("Initialized geet repository in " + newRepo.getRepoPath());
                     break;
-                }catch(IOException e){
+                }
+                else {
+                    System.out.println("Error: geet repository already exists in " + newRepo.getParentPath());
                     break;
             }
 
-                //Adds a specified file to the staging area if the file exists
+            //Adds a specified file to the staging area if the file exists
             case "add":
-                stage = new StagingArea();
                 if (args.length < 2){
                     System.out.println("Error: No file specified" +
-                                     "\nPlease specify the file name: geet.bat add <file>");
+                                     "\nPlease specify the file name: geet add <your file>");
                     break;
                 }
                 File newFile = new File(args[1]);
@@ -59,23 +62,32 @@ public class ArgumentParser {
                     }
                 }
 
-                //Adds files from staging area to the repository with a commit message.
+            //Adds files from staging area to the repository with a commit message.
             case "commit":
                 if (args.length < 2){
                     System.out.println("Error: Invalid commit" +
-                            "\nPlease add commit comment: geet.bat commit <commit message>");
+                            "\nPlease add commit comment: geet commit <your commit message>");
                     break;
                 }
                 else {
-                    System.out.println("Commit will be added later");
-                    break;
+                    if (!stage.commitChanges(args[1])){
+                        System.out.println("Error: No files present in staging area for commit");
+                        break;
+                    }
+                    else{
+                        System.out.println("Files have been commited");
+                        break;
+                    }
                 }
 
-                //displays the commit history
+            //displays the commit history
             case "log":
-                System.out.println("log will be added later");
+                System.out.println(storage.getLog());
                 break;
 
+            case "branch":
+                System.out.println("branching will be added later");
+                break;
             default:
                 System.out.println("Error: Command not found");
                 break;

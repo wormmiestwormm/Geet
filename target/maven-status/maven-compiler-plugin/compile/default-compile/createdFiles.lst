@@ -1,8 +1,14 @@
+Commit.class
 GeetBrain.class
 ArgumentParser.class
-Repository.class
+VertexVisitor.class
 App.class
 StagingArea.class
+PrintVertexVisitor.class
+StorageModule$1.class
+Graph.class
+Repository.class
 Geet.class
 StorageModule.class
 StagingArea$1.class
+Edge.class

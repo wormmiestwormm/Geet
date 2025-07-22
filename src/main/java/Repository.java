@@ -5,25 +5,33 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Repository {
-    Path repoPath = Paths.get(".geet");
-    Path parentPath = repoPath.toAbsolutePath().getParent();
-    String stagingAreaPathString = repoPath.toString() + "\\stagingArea.json";
-    Path stagingAreaPath = Paths.get(stagingAreaPathString);
+    private static Path repoPath = Paths.get(".geet");
+
+    //creating paths for json files within .geet
+    private static String stagingAreaPathString = repoPath.toString() + "\\stagingArea.json";
+    private static String commitStoragePathString = repoPath.toString() + "\\commitLog.json";
+    private static Path stagingAreaPath = Paths.get(stagingAreaPathString);
+    private static Path commitStoragePath = Paths.get(commitStoragePathString);
 
     //create .geet folder to store all the different commits
-    public void initializeRepository() throws IOException {
+    public boolean initializeRepository() throws IOException {
         try {
             Files.createDirectory(repoPath);
             Files.createFile(stagingAreaPath);
+            Files.createFile(commitStoragePath);
+            return true;
 
         } catch (IOException e) {
-            System.out.println("Error: geet repository already exists in " + parentPath);
-            throw new RuntimeException(e);
+            return false;
         }
     }
 
     //returns the absolute path of the repository
     public String getRepoPath(){
         return repoPath.toAbsolutePath().toString();
+    }
+
+    public String getParentPath(){
+        return repoPath.toAbsolutePath().getParent().toString();
     }
 }
