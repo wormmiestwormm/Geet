@@ -10,13 +10,13 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
 public class StagingArea {
-
-    public StagingArea(){}
+    Set<String> stageList;
+    public StagingArea() throws IOException {
+        stageList = readStage();
+    }
 
     //adds file to staging area
     public boolean addFileToStagingArea(File newFile) throws IOException {
-        Set<String> stageList = readStage();
-
         if (stageList == null){
             stageList = new HashSet<>();
         }
@@ -27,12 +27,23 @@ public class StagingArea {
         return true;
     }
 
+    public boolean hasFiles() throws IOException {
+        if (stageList == null || stageList.isEmpty()){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
     //reads arraylist of file names from stagingArea.json
-    public static Set<String> readStage() throws IOException{
+    private static Set<String> readStage() throws IOException{
         try (Reader reader = new FileReader(".geet\\stagingArea.json")){
             Type jsonStageList = new TypeToken<Set<String>>() {}.getType();
             Gson gson = new Gson();
-            return gson.fromJson(reader, jsonStageList);
+            Set<String> set = gson.fromJson(reader, jsonStageList);
+            reader.close();
+            return set;
         }
         catch (IOException e){
             throw new RuntimeException(e);
@@ -40,7 +51,7 @@ public class StagingArea {
     }
 
     //adds updated arraylist to stagingArea.json
-    public static void writeStage(Set<String> stageList) {
+    private static void writeStage(Set<String> stageList) {
         try (Writer writer = new FileWriter(".geet\\stagingArea.json")){
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(stageList, writer);
@@ -51,17 +62,10 @@ public class StagingArea {
     }
 
     //adds files in staging area to repository in storage module
-    public boolean commitChanges(String commitMessage) throws IOException {
-        Set<String> stageList = readStage();
-        if (stageList == null) {
-            return false;
-        }
-
-        StorageModule s = new StorageModule();
-        s.logChanges(commitMessage, stageList);
-
-        stageList.clear();
-        writeStage(stageList);
-        return true;
+    public Set<String>getStageList() throws IOException {
+        Set<String> emptyList = readStage();
+        emptyList.clear();
+        writeStage(emptyList);
+        return stageList;
     }
 }
