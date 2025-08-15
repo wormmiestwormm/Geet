@@ -1,34 +1,34 @@
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Set;
 
 public class ArgumentParser {
-    private String[] args;
-    private static Repository newRepo = new Repository();
+    private final String[] args;
+    private static final Repository newRepo = new Repository();
     private static StorageModule storage;
     private static StagingArea stage;
 
-    public ArgumentParser(String[] args) throws IOException {
+    public ArgumentParser(String[] args) {
         this.args = args;
     }
 
     //
     public void getCommand() throws IOException {
-        if (args.length < 1){
+        if (args.length < 1) {
             System.out.println("-----------------------------------------------------------------------------------" +
                     "\nCommand list:" +
-                    "\n\ninit - Initialize geet repository in current directory" +
-                    "\nadd <your file> - add listed file to staging area" +
-                    "\ncommit -m \"<your commit message>\" - records files in staging area in the repository" +
-                    "\nlog - view commit history" +
-                    "\ncheckout " +
-                    "\n\t-f <specified commit hash> - move the HEAD pointer to the specified commit" +
-                    "\n\t-b <your branch name> - creates a new geet branch from HEAD. New commits will now be made on this branch" +
-                    "\nmerge <branch name 1> <branch name 2> - merges two or more branches together" +
-                    "\n\n-----------------------------------------------------------------------------------");
+                    "\n\ninit\t\t\t\t\tInitialize geet repository in current directory" +
+                    "\nadd <your_file>\t\t\t\tadd listed file to staging area" +
+                    "\ncommit -m \"<your commit message>\"\trecords files in staging area in the repository" +
+                    "\nlog\t\t\t\t\tview commit history" +
+                    "\ncheckout" +
+                    "\n\t-f <specified_commit_hash>\tmove the HEAD pointer to the specified commit" +
+                    "\n\t-b <your_branch_name>\t\tcreates a new geet branch from HEAD. New commits will now be made on this branch" +
+                    "\nswitch\t\t\t\t\tswitch current branch to previous branch" +
+                    "\n\t -b <branch_name>\t\tswitch current branch to specified branch" +
+                    "\nmerge <branch_name_1> <branch_name_2> " +
+                    "\t-m \"<your commit message>\" merges two branches together. The branch listed first becomes the current branch." +
+                    "\n-----------------------------------------------------------------------------------");
             return;
         }
 
@@ -63,16 +63,24 @@ public class ArgumentParser {
                 break;
 
             case "merge":
-                System.out.println("merging will be added later");
-                break;
-
-            case "head":
-                storage.getHead();
-                storage = new StorageModule();
+                mergeFunction();
                 break;
 
             default:
                 System.out.println("Error: Command not found");
+                System.out.println("-----------------------------------------------------------------------------------" +
+                        "\nCommand list:" +
+                        "\n\ninit\t\t\t\t\tInitialize geet repository in current directory" +
+                        "\nadd <your_file>\t\t\t\tadd listed file to staging area" +
+                        "\ncommit -m \"<your commit message>\"\trecords files in staging area in the repository" +
+                        "\nlog\t\t\t\t\tview commit history" +
+                        "\ncheckout" +
+                        "\n\t-f <specified_commit_hash>\tmove the HEAD pointer to the specified commit" +
+                        "\n\t-b <your_branch_name>\t\tcreates a new geet branch from HEAD. New commits will now be made on this branch" +
+                        "\nswitch\t\t\t\t\tswitch current branch to previous branch" +
+                        "\n\t -b <branch_name>\t\tswitch current branch to specified branch" +
+                        "\nmerge <branch_name_1> <branch_name_2> -m \"<your commit message>\" merges two branches together. The branch listed first becomes the current branch." +
+                        "\n-----------------------------------------------------------------------------------");
                 break;
         }
     }
@@ -88,11 +96,11 @@ public class ArgumentParser {
     }
 
     //Checks for command errors, then calls StagingArea Class where files are adds to the staging area file.
-    private void addFunction() throws IOException {
+    private void addFunction() {
         stage = new StagingArea();
         storage = new StorageModule();
 
-        if (args.length < 2){
+        if (args.length < 2) {
             System.out.println("Error: No file specified" +
                     "\nPlease specify the file name: geet add <your file>");
         }
@@ -137,13 +145,13 @@ public class ArgumentParser {
         stage = new StagingArea();
         storage = new StorageModule();
 
-        if (args.length < 2){
+        if (args.length < 2) {
             System.out.println("Error: No command specified" +
                     "\n\tTo move HEAD pointer: checkout -f <specified commit hash>" +
                     "\n\tTo create new branch from HEAD pointer: -b <your branch name>");
             return;
         }
-        else if (stage.hasFiles()){
+        else if (stage.hasFiles()) {
             System.out.println("Error: Staging Area still contains files that have not been commited. " +
                     "Please commit them before moving the Head pointer.");
             return;
@@ -169,7 +177,7 @@ public class ArgumentParser {
                 }
                 else {
                     storage.createNewBranch(args[2]);
-                    System.out.println("New branch " + args[2] + " created, splitting from HEAD: " + storage.getHead() +
+                    System.out.println("New branch " + args[2] + " created, splitting from HEAD: " + storage.getHeadFromCommitTree() +
                             "\nNew commits will be added to this branch.");
                 }
                 break;
@@ -180,25 +188,45 @@ public class ArgumentParser {
         }
     }
 
-    public void switchFunction() throws IOException {
+    private void switchFunction() {
         storage = new StorageModule();
         if (args.length < 2){
-            if (storage.getNumBranches() < 2){
+            if (storage.getNumBranchesFromCommitTree() < 2){
                 System.out.println("Error: No other branch exists to switch to");
             }
             else {
-                storage.switchWithPrevBranch();
+                String prevBranchName = storage.switchWithPrevBranch();
+                String currBranchName = storage.getCurrBranchFromCommitTree();
+                System.out.println("Pointer switched from " + prevBranchName + " to " + currBranchName);
             }
         }
         else{
-            if (!storage.checkHasBranch(args[1])){
+            if (!storage.checkHasBranch(args[1])) {
                 System.out.println("Error: No branch found");
             }
-            else{
-                storage.switchWithSpecifiedBranch(args[1]);
+            else {
+                String prevBranchName = storage.switchWithSpecifiedBranch(args[1]);
+                System.out.println("Pointer switched from " + prevBranchName + " to " + args[1]);
             }
         }
     }
 
+    private void mergeFunction() throws IOException {
+        storage = new StorageModule();
 
+        if (args.length != 5) {
+            System.out.println("Error: Invalid merge command" +
+                    "\nmerge <branch_name_1> <branch_name_2> -m \"<your commit message>\" merges two branches together. The branch listed first becomes the current branch.");
+        }
+        else if (!storage.checkHasBranch(args[1])) {
+            System.out.println("Error: Branch " + args[1] + " is not recognized");
+        }
+        else if (!storage.checkHasBranch(args[2])) {
+            System.out.println("Error: Branch " + args[2] + " is not recognized");
+        }
+        else {
+            storage.initiateMerge(args[1], args[2], args[4]);
+            System.out.println("Branches " + args[1] + " and " + args[2] + " have been merged");
+        }
+    }
 }

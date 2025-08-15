@@ -6,6 +6,7 @@ public class CommitTree {
     private String headCode;
     private String currentBranchName;
     private String previousBranchName;
+    private String baseMergeCommitCode;
 
     public CommitTree(){
         branchList = new HashMap<>();
@@ -13,33 +14,40 @@ public class CommitTree {
         currentBranchName = "master";
         previousBranchName = null;
         headCode = null;
+        baseMergeCommitCode = null;
     }
 
-    public void addToCurrentBranch(String commitHash, String commitMessage, Set<String> stageList){
+    public void addToCurrentBranch(String commitHash, String commitMessage, Set<String> stageList, Set<String> commitFiles) {
         System.out.println(currentBranchName);
-        branchList.get(currentBranchName).addNewCommit(commitHash, commitMessage, stageList);
-        System.out.println(branchList.get(currentBranchName).getCommit(commitHash));
+        branchList.get(currentBranchName).addNewCommit(commitHash, commitMessage, stageList, commitFiles);
     }
 
-    public boolean checkBranchForCommit(String commitHash){
+    public void addMergedCommit(String branchName2, String commitHash, String commitMessage, Set<String> totalFiles) {
+        branchList.get(branchName2).getCommit(branchList.get(branchName2).getTailHash()).setNextCommit(commitHash);
+        branchList.get(currentBranchName).getCommit(branchList.get(currentBranchName).getTailHash()).setNextCommit(commitHash);
+        branchList.get(currentBranchName).createMergedCommit(commitHash, commitMessage, totalFiles);
+    }
+
+    public boolean checkBranchForCommit(String commitHash) {
         return branchList.get(currentBranchName).hasCommit(commitHash);
     }
 
-    public void createNewBranch(String branchName){
+    public void createNewBranch(String branchName) {
         Branch newBranch = new Branch(branchName);
         if (previousBranchName == null){
             previousBranchName = "master";
         }
         Branch prevBranch = branchList.get(previousBranchName);
         Commit commit;
-        if (headCode == null){
+        if (headCode == null) {
             commit = prevBranch.getCommit(prevBranch.getTailHash());
             headCode = commit.hash;
         }
         else {
             commit = prevBranch.getCommit(headCode);
         }
-        newBranch.addCommit(commit);
+        newBranch.addNewBranchCommit(commit);
+        baseMergeCommitCode = commit.hash;
 
         branchList.put(branchName, newBranch);
         System.out.println(currentBranchName);
@@ -51,20 +59,22 @@ public class CommitTree {
         return branchList.containsKey(branchName);
     }
 
-    public void swapToPrevBranch() {
+    public String swapToPrevBranch() {
         String tempHolder = currentBranchName;
         currentBranchName = previousBranchName;
         previousBranchName = tempHolder;
+
+        return previousBranchName;
     }
 
-    public boolean swapBranches(String branchName){
+    public String swapBranches(String branchName) {
         if (!branchList.containsKey(branchName)){
-            return false;
+            return branchName;
         }
         else {
             previousBranchName = currentBranchName;
             currentBranchName = branchName;
-            return true;
+            return previousBranchName;
         }
     }
 
@@ -73,30 +83,62 @@ public class CommitTree {
 
     }
 
-    public String getHeadCode(){
+    public String getHeadCode() {
         return headCode;
     }
 
-    public String getCurrentBranchName(){
+    public String getBaseMergeCommitCode() {
+        return baseMergeCommitCode;
+    }
+
+    public String getCurrentBranchName() {
         return currentBranchName;
     }
 
-    public HashMap<String, Branch> getBranchList(){
+    public HashMap<String, Branch> getBranchList() {
         return branchList;
     }
 
-    public int getBranchListLength(){
+    public int getBranchListLength() {
         return branchList.size();
     }
 
     // Returns the collection of all of this graph's vertices
-    public void printCurrentCommitLog(){
-        Commit commit = branchList.get(currentBranchName).getCommit(branchList.get(currentBranchName).getTailHash());
+    public void printCurrentCommitLog() {
+        System.out.println(currentBranchName + ":");
+        System.out.println();
 
-        while (commit != null){
+        Branch printBranch = branchList.get(currentBranchName);
+        Commit commit = printBranch.getCommit(branchList.get(currentBranchName).getTailHash());
+
+        while (commit != null) {
+            if (commit.getHash().equals(headCode)) {
+                System.out.println("HEAD");
+            }
             System.out.println(commit);
-            commit = branchList.get(currentBranchName).getCommit(commit.previousCommit);
+
+            if (!printBranch.hasCommit(commit.previousCommit) && commit.previousCommit != null) {
+                printBranch = hasCommit(commit.previousCommit);
+            }
+            commit = printBranch.getCommit(commit.previousCommit);
         }
+    }
+
+    private Branch hasCommit(String hashCode) {
+        System.out.println("\tChecking commit tree for " + hashCode);
+        Branch printBranch = null;
+        for (Branch branch : branchList.values()) {
+            System.out.println("\tchecking " + branch.getBranchName());
+            if (branch.hasCommit(hashCode)) {
+                System.out.println("\tcommit found in " + branch.getBranchName());
+                printBranch = branch;
+            }
+        }
+
+        if (printBranch == null) {
+            System.out.println("\tCommit does not exist in entire commit tree");
+        }
+        return printBranch;
     }
 }
 

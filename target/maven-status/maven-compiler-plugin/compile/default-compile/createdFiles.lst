@@ -1,11 +1,13 @@
 Commit.class
-StorageModule$1.class
 ArgumentParser.class
-CommitTree.class
-Repository.class
 App.class
 StagingArea.class
-Geet.class
 Branch.class
+UniqueFiles.class
+StorageModule$1.class
+CommitTree.class
+Repository.class
+Geet.class
 StorageModule.class
+SharedFiles.class
 StagingArea$1.class

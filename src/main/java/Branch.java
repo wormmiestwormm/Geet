@@ -11,49 +11,74 @@ public class Branch {
 
     public Branch(String branchName) {
         this.branchName = branchName;
-        commitLog = new HashMap<String, Commit>();
+        commitLog = new HashMap<>();
     }
 
-    public void addNewCommit(String commitHash, String commitMessage, Set<String> stageList){
+    public void addNewCommit(String commitHash, String commitMessage, Set<String> stageList, Set<String> commitFiles) {
         String commitDate = LocalDate.now().toString();
-        Commit newCommit = new Commit(commitHash, commitMessage, stageList, "author", commitDate);
+        Commit newCommit = new Commit(commitHash, commitMessage, stageList, commitFiles, commitDate);
 
         commitLog.put(commitHash, newCommit);
 
         if (rootHash == null){
             rootHash = newCommit.hash;
-            tailHash = newCommit.hash;
         }
         else {
             commitLog.get(tailHash).nextCommit = newCommit.hash;
             newCommit.previousCommit = tailHash;
-            tailHash = newCommit.hash;
         }
+        tailHash = newCommit.hash;
     }
 
-    public void addCommit(Commit commit){
+    public void addNewBranchCommit(Commit commit) {
         commitLog.put(commit.hash, commit);
+        if (rootHash == null){
+            rootHash = commit.hash;
+        }
+        else {
+            commitLog.get(tailHash).nextCommit = commit.hash;
+            commit.previousCommit = tailHash;
+        }
         tailHash = commit.hash;
     }
 
-    public boolean hasCommit(String commitHash){
-        return commitLog.containsKey(commitHash);
+    public void createMergedCommit(String commitHash, String commitMessage, Set<String> totalFiles) {
+        String commitDate = LocalDate.now().toString();
+
+        Commit mergeCommit = new Commit(commitHash, commitMessage, totalFiles, totalFiles, commitDate);
+        commitLog.put(commitHash, mergeCommit);
+        mergeCommit.previousCommit = tailHash;
+        tailHash = commitHash;
     }
 
-    public Commit getCommit(String commitHash){
+    public boolean hasCommit(String commitHash) {
+        boolean hasCommitConfirm = commitLog.containsKey(commitHash);
+        if (!hasCommitConfirm) {
+            System.out.println("\tcommit does not exist in branch");
+        }
+        return hasCommitConfirm;
+    }
+
+    public Commit getCommit(String commitHash) {
+        if (!commitLog.containsKey(commitHash)) {
+            System.out.println("\tcommit does not exist");
+        }
         return commitLog.get(commitHash);
     }
 
-
-    public String getBranchName (){
+    public String getBranchName () {
         return branchName;
+    }
+
+    public String getTailHash() {
+        return tailHash;
     }
 
     public String getRootHash(){
         return rootHash;
     }
 
-    public String getTailHash() {
-        return tailHash;
+    public HashMap<String, Commit> getCommitLog() {
+        return commitLog;
     }
 }

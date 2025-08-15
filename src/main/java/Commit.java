@@ -1,45 +1,50 @@
 import java.util.Set;
-import java.util.UUID;
 
 public class Commit {
-    //Each commit contains its hash, commit message, set of file names, author, date, and is assigned the previous and next commit in line.
+    //Each commit contains its hash, commit message, set of file names, date, and is assigned the previous and next commit in line.
     //Modified portions of pre-existing files was considered, but due to the time constraints, it was not added.
     public String hash;
     public String message;
-    public Set<String> commitFiles;
-    public String author;
+    public Set<String> updatedFiles;
+    public Set<String> allFiles;
     public String date;
 
     public String previousCommit;
     public String nextCommit;
 
-    public Commit(String hash, String message, Set<String> stagingAreaFiles, String author, String date) {
+    public Commit(String hash, String message, Set<String> stagingAreaFiles, Set<String> commitFiles, String date) {
         this.hash = hash;
         this.message = message;
-        commitFiles = stagingAreaFiles;
-        this.author = author;
+        updatedFiles = stagingAreaFiles;
+        allFiles = commitFiles;
         this.date = date;
 
         previousCommit = null;
         nextCommit = null;
     }
 
-    public String toString(){
-        String printOut = hash +
-                "\nAuthor: " + author +
+    public String toString() {
+        StringBuilder printOut = new StringBuilder(hash +
                 "\nDate commited: " + date +
                 "\nmessage:" +
                 "\n\t" + message +
-                "\nfiles:" + "\n\t";
+                "\nfiles:" + "\n\t");
 
-        for (String fileName: commitFiles){
-            printOut += fileName + "\n\t";
+        for (String fileName: updatedFiles) {
+            printOut.append(fileName).append("\n\t");
         }
+        return printOut.toString();
+    }
 
-        return printOut;
+    public void setNextCommit(String nextCommit){
+        this.nextCommit = nextCommit;
+    }
+
+    public String getHash() {
+        return hash;
     }
 
     public Set<String> getCommitFiles() {
-        return commitFiles;
+        return allFiles;
     }
 }
