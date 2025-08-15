@@ -29,17 +29,11 @@ public class UniqueFiles {
     }
 
     public void copyUniqueFiles(Path copyDirectory) throws IOException {
-        System.out.println("Copy directory: " + copyDirectory);
-
         for (String filePath: uniqueFileArray) {
             StringBuilder fileNameBuilder = new StringBuilder(filePath);
             fileNameBuilder.delete(0, 43);
             String fileName = String.valueOf(fileNameBuilder);
             Path sourcePath = Paths.get(filePath);
-
-            System.out.println(filePath);
-            System.out.println(filePath.length());
-            System.out.println(fileName);
 
             if (fileName.contains("\\")) {
                 String[] pathLayers = fileName.split("\\\\");
@@ -47,37 +41,23 @@ public class UniqueFiles {
                 String commitPath = copyDirectory + "\\" + pathLayers[0];
 
                 for (int x = 0; x < pathLayers.length; x++) {
-                    System.out.println("current layer:" + currentPath);
                     if (Files.isDirectory(Paths.get(currentPath))) {
-                        if (Files.exists(Paths.get(commitPath))) {
-                            System.out.println("Directory " + commitPath + "already exists");
-                        } else {
-                            System.out.println("Creating directory");
+                        if (!Files.exists(Paths.get(commitPath))) {
                             Files.createDirectory(Paths.get(commitPath));
                         }
+
                         currentPath += "\\" + pathLayers[x + 1];
                         commitPath += "\\" + pathLayers[x + 1];
                     }
                     else {
                         Path copyPath = Paths.get(commitPath);
-
-                        System.out.println("Source path: " + sourcePath);
-                        System.out.println("Source path: " + copyPath);
-                        Files.copy(sourcePath,
-                                copyPath,
-                                StandardCopyOption.REPLACE_EXISTING);
+                        Files.copy(sourcePath, copyPath, StandardCopyOption.REPLACE_EXISTING);
                     }
                 }
             }
             else {
                 Path copyPath = Paths.get(copyDirectory + "\\" + fileName);
-
-                System.out.println("Source path: " + sourcePath);
-                System.out.println("Copy path: " + copyPath);
-
-                Files.copy(sourcePath,
-                        copyPath,
-                        StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(sourcePath, copyPath, StandardCopyOption.REPLACE_EXISTING);
             }
         }
     }

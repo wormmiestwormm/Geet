@@ -12,7 +12,6 @@ public class ArgumentParser {
         this.args = args;
     }
 
-    //
     public void getCommand() throws IOException {
         if (args.length < 1) {
             System.out.println("-----------------------------------------------------------------------------------" +

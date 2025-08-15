@@ -38,7 +38,6 @@ public class SharedFiles {
     }
 
     public String getLocalFilePath(int filePathTracker) {
-        System.out.println(localFilePaths[filePathTracker]);
         return localFilePaths[filePathTracker];
     }
 
@@ -49,32 +48,24 @@ public class SharedFiles {
         int x = 0;
 
         while (Files.isDirectory(Paths.get(currentPath))) {
-            System.out.println(currentPath);
-            System.out.println(commitPath);
             if (Files.exists(Paths.get(commitPath))) {
-                System.out.println("Directory " + commitPath + "already exists");
             } else {
                 Files.createDirectory(Paths.get(commitPath));
-                System.out.println("Creating directory");
             }
             currentPath += "\\" + pathLayers[x + 1];
             commitPath += "\\" + pathLayers[x + 1];
         }
-        System.out.println("completed directory copying");
     }
 
     private void deleteDirectories (File file) throws IOException {
-        System.out.println("Looking at " + file.getPath());
         if (file.isDirectory()) {
             File[] fileArray = file.listFiles();
-            System.out.println("Directory found at " + file.getPath());
             for(File x : fileArray) {
                 deleteDirectories(x);
             }
             Files.delete(file.toPath());
         }
         else {
-            System.out.println("Deleting " + file.getPath());
             Files.delete(file.toPath());
         }
     }
@@ -87,9 +78,7 @@ public class SharedFiles {
             if (sharedFile[0] == null) {
                 return true;
             }
-            System.out.println(getLocalFilePath(filePathTracker).contains("\\"));
             if (getLocalFilePath(filePathTracker).contains("\\")) {
-                System.out.println("we are in the file copying method");
                 createDirectories(sharedFile[0], copyDirectory);
             }
 
@@ -101,9 +90,6 @@ public class SharedFiles {
             ArrayList<String> line1 = new ArrayList<>();
             ArrayList<String> line2 = new ArrayList<>();
 
-            System.out.println("LineBase " + sharedFile[0]);
-            System.out.println("Line1 " + sharedFile[1]);
-            System.out.println("Line2 " + sharedFile[2]);
             while ((line = reader.readLine()) != null) {
                 lineBase.add(line);
             }
@@ -125,24 +111,17 @@ public class SharedFiles {
                 if (lineBase.get(x).equals(line1.get(line1Tracker)) && lineBase.get(x).equals(line2.get(line2Tracker))) {
                     writer.write(lineBase.get(x));
                     writer.newLine();
-
-                    System.out.println("all lines same " + "linebase " + x + " line1 " + line1Tracker + " line2 " + line2Tracker);
                     line1Tracker++;
                     line2Tracker++;
 
                     //Line1 is edited/inserted
                 } else if (!lineBase.get(x).equals(line1.get(line1Tracker)) && lineBase.get(x).equals(line2.get(line2Tracker))) {
-                    System.out.println("line1 different linebase " + x + " line1 " + line1Tracker + " line2 " + line2Tracker);
-
                     if (line1.size() - line1Tracker > lineBase.size() - x) {
-                        System.out.println("Checking for Insertion with " + lineBase.get(x));
                         for (insertBlockLimit = line1Tracker; insertBlockLimit < line1.size(); insertBlockLimit++) {
                             if (line1.get(insertBlockLimit).equals(lineBase.get(x))) {
-                                System.out.println("Insertion identified");
                                 while (line1Tracker < insertBlockLimit) {
                                     writer.write(line1.get(line1Tracker));
                                     writer.newLine();
-                                    System.out.println(line1Tracker);
                                     line1Tracker++;
                                 }
                                 x--;
@@ -150,7 +129,6 @@ public class SharedFiles {
                             }
                         }
                         if (insertBlockLimit == line1.size()) {
-                            System.out.println("Not an insertion: " + line1.get(line1Tracker));
                             writer.write(line1.get(line1Tracker));
                             writer.newLine();
 
@@ -167,13 +145,9 @@ public class SharedFiles {
 
                     //Line2 is edited/inserted
                 } else if (lineBase.get(x).equals(line1.get(line1Tracker)) && !lineBase.get(x).equals(line2.get(line2Tracker))) {
-                    System.out.println("line2 different linebase " + x + " line1 " + line1Tracker + " line2 " + line2Tracker);
-
                     if (line2.size() - line2Tracker > lineBase.size() - x) {
-                        System.out.println("Checking for Insertion with " + lineBase.get(x));
                         for (insertBlockLimit = line2Tracker; insertBlockLimit < line2.size(); insertBlockLimit++) {
                             if (line2.get(insertBlockLimit).equals(lineBase.get(x))) {
-                                System.out.println("Insertion identified");
                                 while (line2Tracker < insertBlockLimit) {
                                     writer.write(line2.get(line2Tracker));
                                     writer.newLine();
@@ -184,7 +158,6 @@ public class SharedFiles {
                             }
                         }
                         if (insertBlockLimit == line2.size()) {
-                            System.out.println("Not an insertion: " + line2.get(line2Tracker));
                             writer.write(line2.get(line2Tracker));
                             writer.newLine();
 
@@ -201,15 +174,12 @@ public class SharedFiles {
 
                     //Line1 and Line2 are edited
                 } else if (!lineBase.get(x).equals(line1.get(line1Tracker)) && line1.get(x).equals(line2.get(line2Tracker))) {
-                    System.out.println("line1 and line2 different linebase " + x + " line1 " + line1Tracker + " line2 " + line2Tracker);
                     if ((line1.size() - line1Tracker > lineBase.size() - x) && (line2.size() - line2Tracker > lineBase.size() - x)) {
-                        System.out.println("Checking for Insertion with " + lineBase.get(x));
                         int insertBlockLimit1;
                         int insertBlockLimit2 = line2Tracker;
                         for (insertBlockLimit1 = line1Tracker; insertBlockLimit1 < line1.size(); insertBlockLimit1++) {
                             //The change in Line1 and Line2 are the same
                             if (line1.get(insertBlockLimit1).equals(lineBase.get(x)) && line2.get(insertBlockLimit2).equals(lineBase.get(x))) {
-                                System.out.println("Insertion identified");
                                 while (line1Tracker < insertBlockLimit1) {
                                     writer.write(line1.get(line1Tracker));
                                     writer.newLine();
@@ -232,7 +202,6 @@ public class SharedFiles {
                             insertBlockLimit2++;
                         }
                         if (insertBlockLimit1 == line1.size()) {
-                            System.out.println("Not an insertion: " + line1.get(line1Tracker));
                             writer.write(line1.get(line1Tracker));
                             writer.newLine();
 
@@ -255,7 +224,6 @@ public class SharedFiles {
                     return false;
                 }
             }
-            System.out.println("File eligible for merging");
             reader.close();
             writer.close();
             filePathTracker++;

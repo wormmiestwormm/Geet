@@ -18,7 +18,6 @@ public class CommitTree {
     }
 
     public void addToCurrentBranch(String commitHash, String commitMessage, Set<String> stageList, Set<String> commitFiles) {
-        System.out.println(currentBranchName);
         branchList.get(currentBranchName).addNewCommit(commitHash, commitMessage, stageList, commitFiles);
     }
 
@@ -50,9 +49,7 @@ public class CommitTree {
         baseMergeCommitCode = commit.hash;
 
         branchList.put(branchName, newBranch);
-        System.out.println(currentBranchName);
-        System.out.println(swapBranches(branchName));
-        System.out.println(branchList.keySet() + "\n" + currentBranchName);
+        swapBranches(branchName);
     }
 
     public boolean hasBranch(String branchName) {
@@ -125,18 +122,11 @@ public class CommitTree {
     }
 
     private Branch hasCommit(String hashCode) {
-        System.out.println("\tChecking commit tree for " + hashCode);
         Branch printBranch = null;
         for (Branch branch : branchList.values()) {
-            System.out.println("\tchecking " + branch.getBranchName());
             if (branch.hasCommit(hashCode)) {
-                System.out.println("\tcommit found in " + branch.getBranchName());
                 printBranch = branch;
             }
-        }
-
-        if (printBranch == null) {
-            System.out.println("\tCommit does not exist in entire commit tree");
         }
         return printBranch;
     }

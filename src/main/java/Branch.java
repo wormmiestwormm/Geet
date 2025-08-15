@@ -53,16 +53,10 @@ public class Branch {
 
     public boolean hasCommit(String commitHash) {
         boolean hasCommitConfirm = commitLog.containsKey(commitHash);
-        if (!hasCommitConfirm) {
-            System.out.println("\tcommit does not exist in branch");
-        }
         return hasCommitConfirm;
     }
 
     public Commit getCommit(String commitHash) {
-        if (!commitLog.containsKey(commitHash)) {
-            System.out.println("\tcommit does not exist");
-        }
         return commitLog.get(commitHash);
     }
 
